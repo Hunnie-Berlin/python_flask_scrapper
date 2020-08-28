@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect
+from scrapper import get_jobs
 
 app = Flask("JobScrapper")
 
@@ -10,10 +11,20 @@ def home():
 
 @app.route("/report")
 def report():
-    keyword = request.args.get("word")
-    if keyword:
+    keyword = request.args.get("what")
+    location = request.args.get("where")
+    if keyword and location:
         keyword = keyword.lower()
-        return render_template("report.html", searchingBy=keyword)
+        location = location.lower()
+        jobs = get_jobs(keyword, location)
+        number_of_jobs = len(jobs)
+        return render_template(
+            "report.html",
+            what=keyword,
+            where=location,
+            job_list=jobs,
+            number=number_of_jobs,
+        )
     else:
         return redirect("/")
 
